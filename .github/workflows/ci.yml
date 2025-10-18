@@ -1,0 +1,33 @@
+name: CI - Phase0 smoke
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Docker Compose (preinstalled in runner)
+        run: docker compose version
+
+      - name: Validate docker-compose file
+        run: docker compose -f docker/docker-compose.yml config
+
+      - name: Start minimal services for smoke test
+        run: |
+          docker compose -f docker/docker-compose.yml up -d mariadb dvwa minio neo4j
+          # wait for DVWA
+          for i in {1..30}; do curl -sSf http://localhost:8081 && break || sleep 5; done
+
+      - name: Smoke test DVWA
+        run: |
+          curl -sSf http://localhost:8081 -o /dev/null
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f docker/docker-compose.yml down -v
