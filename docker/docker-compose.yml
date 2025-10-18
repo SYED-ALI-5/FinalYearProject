@@ -1,0 +1,100 @@
+# version: '3.8'
+
+services:
+  # DVWA (web app with vulnerabilities)
+  dvwa:
+    image: vulnerables/web-dvwa
+    container_name: dvwa
+    ports:
+      - "8081:80"
+    environment:
+      - MYSQL_HOST=mariadb
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+    depends_on:
+      - mariadb
+    networks:
+      - labnet
+
+  mariadb:
+    image: mariadb:10.5
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - labnet
+
+  # Optional: OWASP Juice Shop
+  juice-shop:
+    image: bkimminich/juice-shop
+    container_name: juice-shop
+    ports:
+      - "3000:3000"
+    networks:
+      - labnet
+
+  # Kali tools container (for running nmap/sqlmap etc.)
+  kali:
+    image: kalilinux/kali-rolling
+    container_name: kali
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./kali-home:/root
+    networks:
+      - labnet
+
+  # Small vulnerable host: use webgoat or a minimal metasploitable-like
+  vulnerable-host:
+    image: tleemcjr/metasploitable2
+    ports:
+      - "2222:22"
+      - "80:80"
+    container_name: vulnerable-host
+    networks:
+      - labnet
+
+  # Neo4j for graph storage + embeddings (enable auth via env)
+  neo4j:
+    image: neo4j:5
+    container_name: neo4j
+    environment:
+      NEO4J_AUTH: neo4j/testpassword
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+    networks:
+      - labnet
+
+  # MinIO artifact store (S3-compatible)
+  minio:
+    image: minio/minio
+    container_name: minio
+    command: server /data
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    networks:
+      - labnet
+
+  # Milvus (vector DB) - optional
+  milvus:
+    image: milvusdb/milvus:v2.2.9
+    container_name: milvus
+    ports:
+      - "19530:19530"
+    networks:
+      - labnet
+
+networks:
+  labnet:
+    driver: bridge
+
+volumes:
+  neo4j_data:
+  minio_data:
