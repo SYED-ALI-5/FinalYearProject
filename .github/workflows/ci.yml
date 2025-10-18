@@ -2,7 +2,7 @@ name: CI - Phase0 smoke
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
