@@ -3,3 +3,4 @@
 *.xml
 *.log
 .env.example
+.DS_Store
