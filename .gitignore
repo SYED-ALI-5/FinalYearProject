@@ -1,0 +1,5 @@
+/artifacts
+/docker/kali-home/.local/share/sqlmap
+*.xml
+*.log
+.env.example
