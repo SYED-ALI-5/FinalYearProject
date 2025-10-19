@@ -1,0 +1,10 @@
+{
+  "nmap": {
+    "allowed_flags": ["-sS","-sT","-sV","-p","-Pn","-oX"],
+    "max_args": 12
+  },
+  "sqlmap": {
+    "allowed_flags": ["-u","--data","--batch","--level"],
+    "max_args": 12
+  }
+}
