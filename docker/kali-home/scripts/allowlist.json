@@ -4,7 +4,7 @@
     "max_args": 12
   },
   "sqlmap": {
-    "allowed_flags": ["-u","--data","--batch","--level"],
+    "allowed_flags": ["-u","--data","--batch","--level", "--cookie", "--dbs", "--tables", "--columns", "--dump", "-D", "-T", "--passwords"],
     "max_args": 12
   }
 }
