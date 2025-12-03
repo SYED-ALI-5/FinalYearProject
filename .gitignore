@@ -4,3 +4,6 @@
 *.log
 .env.example
 .DS_Store
+.vscode/
+__pycache__/
+.venv/

