@@ -1,6 +1,6 @@
 {
   "nmap": {
-    "allowed_flags": ["-sS","-sT","-sV","-p","-Pn","-oX"],
+    "allowed_flags": ["-sS","-sT","-sV","-p","-Pn","-oX", "--name"],
     "max_args": 12
   },
   "sqlmap": {
