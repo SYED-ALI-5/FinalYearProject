@@ -2,8 +2,6 @@ import asyncio
 from graph import build_graph
 from langchain_ollama import ChatOllama
 
-
-
 async def main():
     llm = ChatOllama(model="deepseek-llm:7b")
     graph = build_graph(llm)

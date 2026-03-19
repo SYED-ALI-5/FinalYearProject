@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SQLMap Agent Architecture</title>
+
+<style>
+
+body{
+font-family: Arial, sans-serif;
+background:#0f172a;
+color:white;
+margin:0;
+padding:40px;
+}
+
+h1{
+text-align:center;
+margin-bottom:40px;
+}
+
+.section{
+border:2px solid #334155;
+border-radius:12px;
+padding:25px;
+margin-bottom:30px;
+background:#020617;
+}
+
+.section-title{
+font-size:20px;
+margin-bottom:20px;
+color:#38bdf8;
+}
+
+.row{
+display:flex;
+justify-content:center;
+align-items:center;
+flex-wrap:wrap;
+gap:20px;
+}
+
+.box{
+background:#1e293b;
+border:2px solid #475569;
+border-radius:10px;
+padding:15px 20px;
+min-width:180px;
+text-align:center;
+font-size:14px;
+}
+
+.arrow{
+font-size:28px;
+margin:0 10px;
+color:#94a3b8;
+}
+
+.component{
+background:#111827;
+border-left:5px solid #22c55e;
+padding:15px;
+margin:15px 0;
+border-radius:8px;
+}
+
+.component h3{
+margin-top:0;
+color:#22c55e;
+}
+
+.graph{
+display:flex;
+justify-content:center;
+align-items:center;
+flex-wrap:wrap;
+gap:30px;
+margin-top:20px;
+}
+
+.node{
+background:#1e293b;
+padding:12px 16px;
+border-radius:8px;
+border:2px solid #38bdf8;
+}
+
+.footer{
+text-align:center;
+margin-top:40px;
+font-size:14px;
+color:#94a3b8;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>SQLMap Agent Automated Security Testing Architecture</h1>
+
+<div class="section">
+
+<div class="section-title">User Interface</div>
+
+<div class="row">
+<div class="box">python3 main.py</div>
+<div class="box">python3 setup_dvwa.py</div>
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="section-title">LangGraph Workflow</div>
+
+<div class="row">
+
+<div class="box">docker_check</div>
+
+<div class="arrow">→</div>
+
+<div class="box">fetch_neo4j<br>Graph RAG</div>
+
+<div class="arrow">→</div>
+
+<div class="box">sqlmap_plan<br>LLM</div>
+
+<div class="arrow">→</div>
+
+<div class="box">sqlmap_execute</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="section-title">Component Details</div>
+
+<div class="component">
+<h3>1. Docker Check (orchestrator.py)</h3>
+Checks if Kali container is running and starts DVWA, Juice Shop, Neo4j and Kali containers.
+</div>
+
+<div class="component">
+<h3>2. Fetch Neo4j (Graph RAG)</h3>
+Queries Neo4j to retrieve endpoints discovered by the Recon Agent.
+</div>
+
+<div class="component">
+<h3>3. SQLMap Planning (LLM Agent)</h3>
+Uses Ollama LLM (Llama3 / DeepSeek) to generate SQLMap commands based on discovered endpoints.
+</div>
+
+<div class="component">
+<h3>4. SQLMap Execution</h3>
+Executes generated commands inside the Kali container and captures output and logs.
+</div>
+
+<div class="component">
+<h3>5. Vulnerability Detection</h3>
+Analyzes SQLMap output to detect SQL injection indicators.
+</div>
+
+<div class="component">
+<h3>6. Store Results</h3>
+Stores the complete workflow in Neo4j for traceability and graph visualization.
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="section-title">Neo4j Graph Workflow</div>
+
+<div class="graph">
+
+<div class="node">ReconAgent</div>
+
+<div class="arrow">→</div>
+
+<div class="node">Endpoint</div>
+
+<div class="arrow">→</div>
+
+<div class="node">GeneratedQuery</div>
+
+<div class="arrow">→</div>
+
+<div class="node">DockerAgent</div>
+
+<div class="arrow">→</div>
+
+<div class="node">ExecutionResult</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="section-title">Technology Stack</div>
+
+<div class="row">
+
+<div class="box">LangGraph</div>
+<div class="box">Ollama LLM</div>
+<div class="box">Neo4j</div>
+<div class="box">SQLMap</div>
+<div class="box">Docker</div>
+<div class="box">Python 3.11</div>
+
+</div>
+
+</div>
+
+<div class="footer">
+Automated Security Testing Agent Framework — SQLMap Agent Phase 2
+</div>
+
+</body>
+</html>

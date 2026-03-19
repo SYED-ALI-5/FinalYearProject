@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  dvwa:
+    image: vulnerables/web-dvwa
+    container_name: dvwa
+    ports:
+      - "8081:80"
+    environment:
+      - MYSQL_HOST=mariadb
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+    depends_on:
+      - mariadb
+    networks:
+      labnet:
+        ipv4_address: 172.18.0.5
+
+  mariadb:
+    image: mariadb:10.5
+    container_name: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      labnet:
+        ipv4_address: 172.18.0.6
+
+  juice-shop:
+    image: bkimminich/juice-shop
+    container_name: juice-shop
+    ports:
+      - "3000:3000"
+    networks:
+      labnet:
+        ipv4_address: 172.18.0.7
+
+  kali:
+    image: kalilinux/kali-rolling
+    container_name: kali
+    tty: true
+    stdin_open: true
+    extra_hosts:
+      - "dvwa:172.18.0.5"
+      - "juice-shop:172.18.0.7"
+    depends_on:
+      - dvwa
+      - juice-shop
+    networks:
+      labnet:
+        ipv4_address: 172.18.0.10
+
+  neo4j:
+    image: neo4j:5
+    container_name: neo4j
+    environment:
+      NEO4J_AUTH: neo4j/testpassword
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+    networks:
+      labnet:
+        ipv4_address: 172.18.0.8
+
+networks:
+  labnet:
+    driver: bridge
+
+volumes:
+  neo4j_data:
