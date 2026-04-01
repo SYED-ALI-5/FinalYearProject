@@ -38,8 +38,11 @@ class OrchestratorAgent:
         command = state.get("command")
 
         if not command:
-            raise ValueError("No command provided")
-
+            return {
+                **state,
+                "error": "No command found in state"
+            }
+        
         print(f"[Orchestrator] Preparing command: {command}")
 
         # Ensure tool exists

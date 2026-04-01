@@ -9,7 +9,7 @@ from neo4j import GraphDatabase
 import xml.etree.ElementTree as ET
 
 
-llm = ChatOllama(model="deepseek-llm:7b")
+llm = ChatOllama(model="gemma3:12b")
 
 
 class AgentState(TypedDict):
