@@ -1,5 +1,4 @@
-from state import AgentState
-from docker_cmds import DockerAgent
+from Agents.docker_cmds import DockerAgent
 
 class OrchestratorAgent:
     def __init__(self):
@@ -38,8 +37,11 @@ class OrchestratorAgent:
         command = state.get("command")
 
         if not command:
-            raise ValueError("No command provided")
-
+            return {
+                **state,
+                "error": "No command found in state"
+            }
+        
         print(f"[Orchestrator] Preparing command: {command}")
 
         # Ensure tool exists

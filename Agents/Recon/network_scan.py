@@ -2,9 +2,11 @@ import xml.etree.ElementTree as ET
 from typing import List, Optional
 import re
 import json
+from state import AgentState
 from distro import name
 from neo4j import AsyncGraphDatabase
 from pydantic import BaseModel, Field, ValidationError, field_validator
+# from base import SubAgent
 
 from state import AgentState
 
@@ -49,7 +51,7 @@ class HostModel(BaseModel):
 # Recon Agent
 # -----------------------------
 
-class ReconAgent:
+class ReconAgent():
 
     def __init__(
         self,
@@ -57,10 +59,10 @@ class ReconAgent:
         llm,
         uri: str = "neo4j://127.0.0.1:7687",
         user: str = "neo4j",
-        password: str = "testpassword",
+        password: str = "12341234",
     ):
-        self.target = target
         self.llm = llm
+        self.target = target
         self.driver = AsyncGraphDatabase.driver(uri, auth=(user, password))
 
 
@@ -70,20 +72,24 @@ class ReconAgent:
 
     async def plan_recon(self, history: str = "") -> List[str]:
 
+        print("Planning recon for target:", self.target)
+
         prompt = f"""
 You are an autonomous penetration testing agent.
-
 Target: {self.target}
 
-Respond ONLY in valid JSON.
+Your task is to generate a JSON object to run an Nmap scan.
+- Use '-p-' to scan all ports.
+- You MUST use '-oX' followed by '-' to output results to stdout.
+- Do NOT include URLs or file paths.
 
-Format:
+Respond ONLY in this exact JSON format:
 {{
     "tool": "nmap",
     "args": ["-p-", "-oX", "-", "{self.target}"]
 }}
 """
-
+        
         response = await self.llm.ainvoke(prompt)
 
         content = response.content.strip()
@@ -197,117 +203,34 @@ Format:
 
         hosts_json = json.dumps([h.model_dump() for h in hosts], indent=2)
 
-        prompt = f"""
-                    You are an expert Neo4j Cypher engineer.
 
-                    Data example:
-                    __DATA__
+        query = """
+    // 1. Ensure the Host exists
+    MERGE (h:Host {ip: $ip})
+    SET h.status = $status
 
-                    Your task is to generate a valid Cypher query to store Nmap scan results in a Neo4j graph database.
+    // 2. Carry the Host 'h' and the ports list into the UNWIND
+    WITH h, $ports AS ports
+    UNWIND ports AS p
 
-                    IMPORTANT RULES (must be followed strictly):
+    // 3. Ensure the Port exists
+    MERGE (port:Port {number: p.portid, protocol: p.protocol})
 
-                    1. The query will receive the following parameters:
-                       $ip      → string
-                       $status  → string
-                       $ports   → list of objects
+    // 4. Create the relationship between Host and Port
+    // We use MERGE here so it doesn't create duplicate lines
+    MERGE (h)-[:HAS_PORT]->(port)
 
-                    2. Each port object inside $ports contains:
-                       portid
-                       protocol
-                       service_name
-                       product
-                       version
+    // 5. Ensure the Service exists
+    WITH h, port, p
+    MERGE (s:Service {name: p.service_name})
+    SET s.product = coalesce(p.product, "unknown"),
+        s.version = coalesce(p.version, "unknown")
 
-                    3. The query MUST start by creating or updating the Host node:
+    // 6. Create the relationship between Port and Service
+    MERGE (port)-[:RUNS]->(s)
+    """
 
-                    MERGE (h:Host {{ip: $ip}})
-                    SET h.status = $status
-
-                    4. Because Cypher requires variable scoping, you MUST include:
-
-                    WITH h
-
-                    before using UNWIND.
-
-                    5. Ports must be processed using:
-
-                    UNWIND $ports AS p
-
-                    6. Graph schema:
-
-                    Nodes:
-                    Host(ip, status)
-                    Port(number, protocol)
-                    Service(name, product, version)
-
-                    Relationships:
-                    Host-[:HAS_PORT]->Port
-                    Port-[:RUNS]->Service
-
-                    7. Port fields must be accessed ONLY like this:
-                    p.portid
-                    p.protocol
-                    p.service_name
-                    p.product
-                    p.version
-
-                    8. The query must create the following structure:
-
-                    Host → HAS_PORT → Port → RUNS → Service
-
-                    9. Do NOT create parameters like:
-                    $portid
-                    $protocol
-                    $service_name
-
-                    Only use values from `p`.
-
-                    10. The output must be ONLY a valid Cypher query.
-
-                    Do NOT include:
-                    - explanations
-                    - markdown
-                    - ``` fences
-                    - comments
-
-                    Data example:
-                    {hosts_json}
-
-                    11. Some service fields may be null.
-
-                    NEVER use nullable properties in MERGE.
-
-                    Service nodes MUST be created using ONLY the service name:
-
-                    MERGE (s:Service {{name: p.service_name}})
-
-                    Optional properties must be assigned using SET with coalesce():
-
-                    SET s.product = coalesce(p.product, "unknown"),
-                    s.version = coalesce(p.version, "unknown")
-
-                    EXAMPLE:
-                    MERGE (h:Host {{ip: $ip}})
-                    SET h.status = $status
-
-                    WITH h
-                    UNWIND $ports AS p
-
-                    MERGE (port:Port {{number:p.portid, protocol:p.protocol}})
-                    MERGE (h)-[:HAS_PORT]->(port)
-
-                    MERGE (s:Service {{name:p.service_name}})
-                    SET s.product = coalesce(p.product,"unknown"),
-                    s.version = coalesce(p.version,"unknown")
-
-                    MERGE (port)-[:RUNS]->(s)
-        """
-        prompt = prompt.replace("__DATA__", hosts_json)
-
-        response = await self.llm.ainvoke(prompt)
-
-        return response.content.strip()
+        return query.strip()
     
     def clean_cypher(self, query: str) -> str:
         query = query.strip()
@@ -350,6 +273,38 @@ Format:
     # Parse + Store Pipeline
     # -----------------------------
 
+    # async def parse_and_store(self, state: AgentState) -> AgentState:
+
+    #     xml_string = state.get("docker_result")
+
+    #     if not xml_string:
+    #         return {
+    #             **state,
+    #             "error": "No scan result found"
+    #         }
+
+    #     print("\n Parsed XML:", xml_string, '\n')
+
+    #     try:
+
+    #         hosts = self._parse_nmap_xml(xml_string)
+
+    #         await self._store_hosts(hosts)
+
+    #     except Exception as e:
+
+    #         print("Parsing error:", e)
+
+    #         return {
+    #             **state,
+    #             "error": str(e)
+    #         }
+
+    #     return {
+    #         **state,
+    #         "message": f"Recon completed for {self.target}"
+    #     }
+
     async def parse_and_store(self, state: AgentState) -> AgentState:
 
         xml_string = state.get("docker_result")
@@ -359,17 +314,27 @@ Format:
                 **state,
                 "error": "No scan result found"
             }
+        
+
+        print("\n Parsed XML:", xml_string, '\n')
 
         try:
-
             hosts = self._parse_nmap_xml(xml_string)
 
             await self._store_hosts(hosts)
 
+        # 🔥 IMPORTANT: expose structured data to state
+            services = [
+                {
+                    "ip": h.ip,
+                    "status": h.status,
+                    "ports": [p.model_dump() for p in h.ports]
+                }
+                for h in hosts
+            ]
+
         except Exception as e:
-
             print("Parsing error:", e)
-
             return {
                 **state,
                 "error": str(e)
@@ -377,9 +342,9 @@ Format:
 
         return {
             **state,
+            "services": services,   # ✅ THIS IS CRITICAL
             "message": f"Recon completed for {self.target}"
         }
-
 
     # -----------------------------
     # Close Database Connection
@@ -387,3 +352,120 @@ Format:
 
     async def close(self):
         await self.driver.close()
+
+
+
+
+
+        #line 218
+                # prompt = f"""
+        #             You are an expert Neo4j Cypher engineer.
+
+        #             Data example:
+        #             __DATA__
+
+        #             Your task is to generate a valid Cypher query to store Nmap scan results in a Neo4j graph database.
+
+        #             IMPORTANT RULES (must be followed strictly):
+
+        #             1. The query will receive the following parameters:
+        #                $ip      → string
+        #                $status  → string
+        #                $ports   → list of objects
+
+        #             2. Each port object inside $ports contains:
+        #                portid
+        #                protocol
+        #                service_name
+        #                product
+        #                version
+
+        #             3. The query MUST start by creating or updating the Host node:
+
+        #             MERGE (h:Host {{ip: $ip}})
+        #             SET h.status = $status
+
+        #             4. Because Cypher requires variable scoping, you MUST include:
+
+        #             WITH h
+
+        #             before using UNWIND.
+
+        #             5. Ports must be processed using:
+
+        #             UNWIND $ports AS p
+
+        #             6. Graph schema:
+
+        #             Nodes:
+        #             Host(ip, status)
+        #             Port(number, protocol)
+        #             Service(name, product, version)
+
+        #             Relationships:
+        #             Host-[:HAS_PORT]->Port
+        #             Port-[:RUNS]->Service
+
+        #             7. Port fields must be accessed ONLY like this:
+        #             p.portid
+        #             p.protocol
+        #             p.service_name
+        #             p.product
+        #             p.version
+
+        #             8. The query must create the following structure:
+
+        #             Host → HAS_PORT → Port → RUNS → Service
+
+        #             9. Do NOT create parameters like:
+        #             $portid
+        #             $protocol
+        #             $service_name
+
+        #             Only use values from `p`.
+
+        #             10. The output must be ONLY a valid Cypher query.
+
+        #             Do NOT include:
+        #             - explanations
+        #             - markdown
+        #             - ``` fences
+        #             - comments
+
+        #             Data example:
+        #             {hosts_json}
+
+        #             11. Some service fields may be null.
+
+        #             NEVER use nullable properties in MERGE.
+
+        #             Service nodes MUST be created using ONLY the service name:
+
+        #             MERGE (s:Service {{name: p.service_name}})
+
+        #             Optional properties must be assigned using SET with coalesce():
+
+        #             SET s.product = coalesce(p.product, "unknown"),
+        #             s.version = coalesce(p.version, "unknown")
+
+        #             EXAMPLE:
+        #             MERGE (h:Host {{ip: $ip}})
+        #             SET h.status = $status
+
+        #             WITH h, $ports AS ports
+        #             UNWIND ports AS p
+
+        #             MERGE (port:Port {{number: p.portid, protocol: p.protocol}})
+        #             MERGE (h)-[:HAS_PORT]->(port)
+
+        #             MERGE (s:Service {{name: p.service_name}})
+        #             SET s.product = coalesce(p.product, "unknown"),
+        #             s.version = coalesce(p.version, "unknown")
+
+        #             MERGE (port)-[:RUNS]->(s)
+        # """
+        # prompt = prompt.replace("__DATA__", hosts_json)
+
+        # response = await self.llm.ainvoke(prompt)
+
+        # return response.content.strip()
