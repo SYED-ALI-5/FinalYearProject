@@ -42,15 +42,18 @@ def build_graph(llm):
     
     async def analysis_node(state):
         print("[Analysis] Analyzing results...")
+        # print('current state',state)
         return await analysis_agent.run(state)
 
     async def planning_node(state):
         print("[Planning] Creating attack plan...")
+        print('current state',state)
         return await planning_agent.run(state)
 
     ## for planned execution
     async def execution_node(state):
         print("[Execution] Executing command...")
+        # print('current state',state)
         return await execution_agent.run(state)
 
     async def feedback_node(state):

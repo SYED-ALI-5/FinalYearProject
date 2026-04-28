@@ -50,6 +50,8 @@ SCHEMA:
 
         data = json.loads(match.group(0))
 
+        print("LLM Analysis Response:", data)
+
         return {
             **state,
             "services": data["services"]

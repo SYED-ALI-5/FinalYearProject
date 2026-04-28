@@ -3,6 +3,7 @@ from Agents.docker_cmds import DockerAgent
 class OrchestratorAgent:
     def __init__(self):
         self.docker_agent = DockerAgent()
+        
 
     # --------------------------------
     # Ensure lab + Kali running
@@ -10,11 +11,13 @@ class OrchestratorAgent:
     async def ensure_lab_ready(self, state):
 
         print("[Orchestrator] Checking Kali container...")
+        
 
         running = await self.docker_agent.is_kali_running()
 
         if not running:
             await self.docker_agent.start_lab()
+            await self.docker_agent.run_in_kali(["mkdir", "-p", "/root/output"])
 
         return {**state, "docker_status": "ON"}
 

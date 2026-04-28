@@ -27,3 +27,11 @@ apt install -y jq
 clear
 /root/scripts/run_allowed.sh sqlmap -u "http://dvwa/vulnerabilities/sqli/?id=1&Submit=Submit" --cookie="PHPSESSID=jqfr7435v2lml5a54ip1jgmco7; security=low"
 exit
+apt update
+apt install -y dirb wordlists
+ls /usr/share/wordlists/dirb/
+clear
+exit
+ls /root/output
+ls /root/
+exit

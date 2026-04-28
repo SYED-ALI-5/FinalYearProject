@@ -72,15 +72,16 @@
 #         }
 
 
+from curses import raw
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Dict, Literal
 
 class Step(BaseModel):
     technique: Literal[
-        "directory_discovery",
-        "sql_injection",
+        "directorydiscovery",
+        "sqli",
         "fuzzing",
-        "brute_force"
+        "bruteforce"
     ]
     description: str
     params: Dict = Field(default_factory=dict)
@@ -141,9 +142,10 @@ Services:
         ])
 
         content = res.content.strip()
+        print("LLM Planning Raw Response:", content)
 
         try:
-            raw = json.loads(content)  # 🔥 direct parse (no regex)
+            raw = json.loads(content)
 
             validated = PlanningOutput.model_validate(raw)
 
