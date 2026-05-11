@@ -1,0 +1,36 @@
+{
+  "known_paths": [],
+  "executed_actions": [
+    {
+      "step": 0,
+      "query": "fuzz directories",
+      "action": {
+        "action": "fuzz",
+        "url": "/path/FUZZ",
+        "method": "GET",
+        "data": null,
+        "headers": {}
+      },
+      "success": false,
+      "failure": "GENERIC_ERROR",
+      "retries": 0
+    },
+    {
+      "step": 1,
+      "query": "fuzz directories",
+      "action": {
+        "action": "fuzz",
+        "url": "/path/FUZZ",
+        "method": "GET",
+        "data": null,
+        "headers": {}
+      },
+      "success": false,
+      "failure": "GENERIC_ERROR",
+      "retries": 0
+    }
+  ],
+  "last_failure": "GENERIC_ERROR",
+  "last_success": false,
+  "last_error_detail": "GENERIC_ERROR"
+}

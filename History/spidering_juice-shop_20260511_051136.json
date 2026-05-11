@@ -1,0 +1,1 @@
+{"technique": "spidering", "target": "juice-shop", "command": ["bash", "-c", "gospider -s http://juice-shop:3000 -o json -d 2 -t 10 -c 10 > /root/output/gospider_juice-shop.json"], "result": ""}

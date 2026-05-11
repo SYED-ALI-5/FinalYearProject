@@ -1,0 +1,2 @@
+Target URL,Place,Parameter,Technique(s),Note(s)
+http://juice-shop:3000/rest/products/search?q=test,GET,q,BT,

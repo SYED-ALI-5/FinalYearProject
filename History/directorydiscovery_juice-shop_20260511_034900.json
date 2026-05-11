@@ -1,0 +1,17 @@
+{
+  "timestamp": "20260511_034900",
+  "technique": "directorydiscovery",
+  "target": "juice-shop",
+  "command": [
+    "ffuf",
+    "-u",
+    "http://juice-shop/FUZZ",
+    "-w",
+    "/usr/share/wordlists/dirb/common.txt",
+    "-o",
+    "/root/output/ffuf_juice-shop.json",
+    "-of",
+    "json"
+  ],
+  "result": ""
+}

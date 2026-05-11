@@ -35,6 +35,7 @@ class AgentState(TypedDict):
 
     # --- Step Execution ---
     step_result: NotRequired[Any]
+    # step_completed: NotRequired[bool]
 
     # --- Control ---
     done: NotRequired[bool]

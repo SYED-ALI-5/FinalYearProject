@@ -1,0 +1,17 @@
+{
+  "timestamp": "20260505_054620",
+  "technique": "directorydiscovery",
+  "target": "dvwa",
+  "command": [
+    "ffuf",
+    "-u",
+    "http://dvwa/docs/FUZZ",
+    "-w",
+    "/usr/share/wordlists/dirb/common.txt",
+    "-o",
+    "/root/output/ffuf_dvwa_deep.json",
+    "-of",
+    "json"
+  ],
+  "result": "\r\u001b[2K.htpasswd               [Status: 403, Size: 293, Words: 22, Lines: 12, Duration: 3ms]\u001b[0m\n\r\u001b[2K.hta                    [Status: 403, Size: 288, Words: 22, Lines: 12, Duration: 258ms]\u001b[0m\n\r\u001b[2K                        [Status: 200, Size: 1129, Words: 74, Lines: 18, Duration: 275ms]\u001b[0m\n\r\u001b[2K.htaccess               [Status: 403, Size: 293, Words: 22, Lines: 12, Duration: 571ms]\u001b[0m\n"
+}

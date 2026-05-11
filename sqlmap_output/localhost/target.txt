@@ -1,0 +1,3 @@
+http://localhost:3000/rest/user/login (POST)  # /usr/bin/sqlmap -u http://localhost:3000/rest/user/login --method POST --data={\"email\":\"test\",\"password\":\"test\"} "--headers=Content-Type: application/json" --batch --level=5 --risk=3 --random-agent
+
+{"email":"test","password":"test"}

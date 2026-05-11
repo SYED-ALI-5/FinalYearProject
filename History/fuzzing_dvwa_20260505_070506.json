@@ -1,0 +1,17 @@
+{
+  "timestamp": "20260505_070506",
+  "technique": "fuzzing",
+  "target": "dvwa",
+  "command": [
+    "ffuf",
+    "-u",
+    "http://dvwa/index.php?FUZZ=test",
+    "-w",
+    "/usr/share/wordlists/dirb/common.txt",
+    "-o",
+    "/root/output/ffuf_params_dvwa.json",
+    "-of",
+    "json"
+  ],
+  "result": "Encountered error(s): 1 errors occurred.\n\t* stat /usr/share/wordlists/dirb/common.txt: no such file or directory\n\nEncountered error(s): 1 errors occurred.\n\t* stat /usr/share/wordlists/dirb/common.txt: no such file or directory\n\n"
+}

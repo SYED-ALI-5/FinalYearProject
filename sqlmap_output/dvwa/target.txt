@@ -1,0 +1,1 @@
+http://dvwa/vulnerabilities/sqli/?id=1&Submit=Submit (GET)  # /usr/bin/sqlmap -u http://dvwa/vulnerabilities/sqli/?id=1&Submit=Submit --cookie "PHPSESSID=jqfr7435v2lml5a54ip1jgmco7; security=low"

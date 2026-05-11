@@ -8,7 +8,7 @@ async def main():
 
     initial_state = {
         "docker_status": "OFF",
-        "target": "dvwa",
+        "target": "juice-shop",
         "command": None,
         "docker_result": None,
         "message": None

